@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สรุปความคืบหน้าโครงการ ACEP (สำหรับนำเสนอผู้บริหาร)</title>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+    </script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f1219;
+            color: #f8fafc;
+            padding: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        h1, h2, h3 {
+            color: #38bdf8;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 8px;
+            margin-top: 30px;
+        }
+        .mermaid-container {
+            background-color: #1e293b;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .mermaid {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        .mermaid svg {
+            width: 100% !important;
+            max-width: 900px !important;
+            height: auto !important;
+        }
+        .card {
+            background-color: #1e293b;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        ul {
+            margin-bottom: 12px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .status-done {
+            color: #4ade80;
+            font-weight: bold;
+        }
+        .status-next {
+            color: #facc15;
+            font-weight: bold;
+        }
+        .status-future {
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Agentic Coaching & Evaluation Platform (ACEP)</h1>
+    <p>เอกสารสรุปสถาปัตยกรรมระบบและความคืบหน้าโครงการ สำหรับนำเสนอผู้บริหาร (CTO / HR / QA)</p>
+
+    <div class="card">
+        <h2>1. สถาปัตยกรรมระบบ (Project Structure & Data Flow)</h2>
+        <p>แสดงโครงสร้างของระบบที่พัฒนาขึ้นในรูปแบบ Proof of Concept (PoC) ซึ่งเชื่อมต่อฐานข้อมูลเชิงสัมพันธ์เข้ากับ AI โดยไม่มีค่าใช้จ่าย</p>
+        
+        <div class="mermaid-container">
+            <div class="mermaid">
+                flowchart TD
+                    subgraph Data_Inputs ["ช่องทางการรับข้อมูล (CS Agents)"]
+                        T["Text Transcript"]
+                        A["3CX Audio File"]
+                        D["Google Doc URL"]
+                    end
+
+                    subgraph Frontend ["Streamlit UI Dashboard"]
+                        UI_A["Agent Self-Evaluation Portal"]
+                        UI_M["QA Manager Inbox"]
+                    end
+
+                    subgraph AI_Engine ["Gemini API (Free Tier)"]
+                        STT["Speech-to-Text"]
+                        LLM{"Evaluator Model<br/>gemini-3.6-flash"}
+                    end
+
+                    subgraph Database ["Persistent Data Layer"]
+                        DB[("SQLite / PostgreSQL<br/>- Employees<br/>- Test_Sessions<br/>- Rubric_Versions")]
+                    end
+
+                    T --> UI_A
+                    D --> UI_A
+                    A --> UI_A
+
+                    UI_A -- "ส่งไฟล์เสียง" --> STT
+                    STT -- "คืนค่าข้อความ" --> UI_A
+                    
+                    UI_A -- "ส่งข้อความ + กฎเกณฑ์" --> LLM
+                    LLM -- "คืนค่า JSON Scorecard" --> UI_A
+
+                    UI_A -- "บันทึกผลคะแนน" --> DB
+                    DB -- "ดึงรายการที่ต้องตรวจ" --> UI_M
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>2. แผนการดำเนินงานและสถานะปัจจุบัน (Milestone Review)</h2>
+        <p>ภาพรวมของการส่งมอบงานตามแผนที่วางไว้ เพื่อใช้ปรึกษาหารือและกำหนดทิศทางขั้นต่อไป</p>
+        
+        <ul>
+            <li>
+                <span class="status-done">[เสร็จสิ้น] ระยะที่ 1: ระบบฐานข้อมูล (Persistent Data Layer)</span>
+                <ul>
+                    <li>ออกแบบ Database Schema เชิงสัมพันธ์รองรับ PDCA ด้วย SQLAlchemy</li>
+                    <li>ระบบสามารถสลับจาก SQLite ไปใช้ PostgreSQL ได้ทันทีเมื่อขึ้น Production</li>
+                </ul>
+            </li>
+            <li>
+                <span class="status-done">[เสร็จสิ้น] ระยะที่ 4: หน้าจอแดชบอร์ด (QA Manager & Agent UI)</span>
+                <ul>
+                    <li>พัฒนาหน้าจอ Streamlit สำหรับพนักงาน (ประเมินตนเองผ่าน Text/Audio/Docs)</li>
+                    <li>พัฒนาหน้าจอ Inbox สำหรับหัวหน้า QA แบบ Side-by-side view</li>
+                </ul>
+            </li>
+            <li>
+                <span class="status-next">[กำลังดำเนินการ] ระยะที่ 2: ระบบเซ็นเซอร์ข้อมูลส่วนบุคคล (PII Redaction)</span>
+                <ul>
+                    <li><strong>ประเด็นหารือ:</strong> การพัฒนา Middleware สำหรับเซ็นเซอร์ข้อมูลลูกค้า (ชื่อ, เบอร์โทร) ก่อนส่งให้ Public AI เพื่อความปลอดภัยด้าน PDPA</li>
+                </ul>
+            </li>
+            <li>
+                <span class="status-future">[แผนในอนาคต] ระยะที่ 3: ระบบจำลองลูกค้าด้วยเสียง (Voice Simulator)</span>
+                <ul>
+                    <li><strong>ประเด็นหารือ:</strong> การเชื่อมต่อ WebRTC กับ Gemini Multimodal Live API เพื่อให้พนักงานซ้อมคุยโต้ตอบด้วยเสียงแบบ Real-time โดยไม่ต้องเสียค่าโทรศัพท์ (Twilio)</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+</body>
+</html>

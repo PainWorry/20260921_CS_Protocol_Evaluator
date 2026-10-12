@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.py[cod]
+.streamlit/
+.env
+.env.*
+*.pem
+*.key

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTO Presentation: ACEP</title>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+    </script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1, h2, h3 {
+            color: #38bdf8;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 8px;
+        }
+        .mermaid {
+            background-color: #1e293b;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+        }
+        .card {
+            background-color: #1e293b;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        li { 
+            margin-bottom: 12px; 
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 1.5rem 0; 
+        }
+        th, td { 
+            border: 1px solid #334155; 
+            padding: 12px; 
+            text-align: left; 
+        }
+        th { 
+            background-color: #0f172a; 
+            color: #38bdf8;
+        }
+        code {
+            background-color: #0f172a;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: "Courier New", Courier, monospace;
+            color: #f8fafc;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Executive Proposal: Agentic Coaching & Evaluation Platform (ACEP)</h1>
+
+    <div class="card">
+        <h2>1. Architectural Wireframe</h2>
+        <p>The following logical architecture expands the initial proof-of-concept into a scalable, enterprise-grade coaching platform supporting continuous improvement (PDCA).</p>
+
+        <div class="mermaid">
+            graph TD
+                subgraph Data Sources
+                    T[Theory Test<br>SD-CS-01 / Way Quiz]
+                    A[Applied Test<br>Chat / Voice Simulation]
+                    R[Real Practice<br>3CX Log + HR Evidence]
+                end
+
+                subgraph Persistent Data Layer
+                    PDL[(Data Lake & Version Control)]
+                    K[KM Base<br>Versioned Policies] -.-> PDL
+                    C[Case Repository<br>Tagged Transcripts] -.-> PDL
+                    RV[Rubric History<br>Temporal Tables] -.-> PDL
+                end
+
+                subgraph Processing & Output
+                    E{LLM Evaluator}
+                    D[Dashboard<br>Score, Trend, Coaching]
+                end
+
+                T --> PDL
+                A --> PDL
+                R -->|PII Scrubbing| PDL
+                
+                PDL --> E
+                E --> D
+                D -.->|PDCA: Aggregate insights update rubrics| K
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>2. Dashboard UI Wireframe Concept</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="2">Executive Overview (Top Band)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="2"><strong>Global Quality Score:</strong> 85% (+2%) | <strong>Total Evaluations:</strong> 1,204 | <strong>Active Rubric:</strong> v2.4</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Evaluation Source Distribution</th>
+                    <th>Agent Performance Trends</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>[Pie Chart] <br> - Theory (20%) <br> - Applied Sim (50%) <br> - Real 3CX (30%)</td>
+                    <td>[Line Graph] <br> Historical performance mapped against Rubric version changes.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="6">Recent Coaching Cases (Case Repository)</th>
+                </tr>
+                <tr>
+                    <th>ID</th>
+                    <th>Source</th>
+                    <th>Agent</th>
+                    <th>Score</th>
+                    <th>Tag</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>102</td>
+                    <td>3CX Log</td>
+                    <td>A. Smith</td>
+                    <td>72/100</td>
+                    <td>Escalation, Empathy</td>
+                    <td>[View AI Rationale]</td>
+                </tr>
+                <tr>
+                    <td>103</td>
+                    <td>Simulator</td>
+                    <td>B. Jones</td>
+                    <td>95/100</td>
+                    <td>Product Knowledge</td>
+                    <td>[View Transcript]</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>3. Addressing Technical Constraints</h2>
+
+        <h3>A. Real Practice (3CX) Integration & Security</h3>
+        <p>Processing real customer interactions introduces severe data privacy and compliance risks (PDPA/GDPR/PCI).</p>
+        <ul>
+            <li><strong>Constraint:</strong> Raw 3CX logs cannot be fed directly to an LLM evaluator.</li>
+            <li><strong>Solution (Architecture):</strong> Implement a Data Sanitization Middleware (e.g., using NLP NER models or regex) to redact Personally Identifiable Information (PII) before the transcript enters the Persistent Data Layer.</li>
+            <li><strong>Access Control:</strong> Strict Role-Based Access Control (RBAC) must be enforced. Evaluators and AI models operate only on masked data; original audio/logs remain secured on-premise or within isolated storage.</li>
+        </ul>
+
+        <h3>B. Persistent Data Layer Design</h3>
+        <p>Transitioning from one-shot processing to a continuous learning loop requires a structured, multi-model data architecture.</p>
+        <ul>
+            <li><strong>Schema Design:</strong>
+                <ul>
+                    <li><strong>Rubric Versioning:</strong> Use temporal tables in a relational database (PostgreSQL). Every evaluation must lock onto a specific <code>rubric_version_id</code> to ensure historical scores remain valid when the baseline criteria change.</li>
+                    <li><strong>Case Repository:</strong> Utilize a Document Database (MongoDB or PostgreSQL JSONB) to store transcripts. Append metadata tags (<code>test_type</code>, <code>competency_failed</code>, <code>agent_id</code>) to enable advanced filtering and aggregate trend analysis.</li>
+                    <li><strong>KM Base:</strong> Implement a Git-like version control system for policy documents. When the LLM evaluates a case, it retrieves the exact KM document version that was active at the time of the test.</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+</body>
+</html>
